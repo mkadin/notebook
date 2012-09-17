@@ -41,3 +41,4 @@ $string['pluginadministration'] = 'Notebook administration';
 $string['pluginname'] = 'Notebook';
 $string['session_name'] = 'Session name';
 $string['session_prompts'] = 'Session Prompts';
+$string['gradeingradebook'] = 'Grade in gradebook';

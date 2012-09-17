@@ -412,6 +412,7 @@ function notebook_print_user_entry($course, $user, $entry, $teachers, $grades) {
     echo "</td></tr>";
 
     if ($entry) {
+       
         echo "\n<tr>";
         echo "<td width=\"35\" valign=\"top\">";
 /*
@@ -437,10 +438,10 @@ function notebook_print_user_entry($course, $user, $entry, $teachers, $grades) {
         $grading_info = grade_get_grades($course->id, 'mod', 'notebook', $entry->notebook, array($user->id));
         if ($gradingdisabled = $grading_info->items[0]->grades[$user->id]->locked || $grading_info->items[0]->grades[$user->id]->overridden) {
             $attrs['disabled'] = 'disabled';
-            $hiddengradestr = '<input type="hidden" name="r'.$entry->id.'" value="'.$entry->rating.'"/>';
+          //  $hiddengradestr = '<input type="hidden" name="r'.$entry->id.'" value="'.$entry->rating.'"/>';
             $gradebooklink = '<a href="'.$CFG->wwwroot.'/grade/report/grader/index.php?id='.$course->id.'">';
             $gradebooklink.= $grading_info->items[0]->grades[$user->id]->str_long_grade.'</a>';
-            $gradebookgradestr = '<br/>'.get_string("gradeingradebook", "journal").':&nbsp;'.$gradebooklink;
+            $gradebookgradestr = '<br/>'.get_string("gradeingradebook", "notebook").':&nbsp;'.$gradebooklink;
             
            // $feedbackdisabledstr = 'disabled="disabled"';
            //$feedbacktext = $grading_info->items[0]->grades[$user->id]->str_feedback;
@@ -464,12 +465,110 @@ function notebook_print_user_entry($course, $user, $entry, $teachers, $grades) {
             echo '<input type="hidden" name="c'.$entry->id.'" value="'.$feedbacktext.'"/>';
         }
 */
+        //$nid = $notebook->id;
+
+		$notebook  = $DB->get_record('notebook', array('id' => $entry->notebook), '*', MUST_EXIST);
+		$sessions = $DB->get_records('notebook_sessions', array('nid' => $notebook->id));
+		if ($sessions) {
+			notebook_print($notebook, $sessions);
+		}
         echo "</td></tr>";
     }
     echo "</table><br clear=\"all\" />\n";
     
 }
 
+function notebook_print($notebook, $sessions)  {
+  
+  global $USER, $OUTPUT, $DB, $CFG;
+  //require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+  //require_once(dirname(__FILE__).'/lib.php');
+
+  echo "<div class='notebook-session-wrapper'>";
+  if ($notebook->intro) { // Conditions to show the intro can change to look for own settings or whatever
+    echo $OUTPUT->box(format_module_intro('notebook', $notebook, $cm->id), 'generalbox mod_introbox', 'notebookintro');
+  }
+  echo "<div class='notebook-print'>";
+  foreach ($sessions as $session) {
+    echo '<div class="session"><h3><a href="' . $CFG->wwwroot . '/mod/notebook/session.php?id=' . $session->id . '">' . $session->name . '</a></h3>';
+    
+    $probes = $DB->get_records('notebook_probes', array('sid' => $session->id));
+	$pids = array_keys($probes);
+	
+	$activities = $DB->get_records('notebook_activities', array('sid' => $session->id));
+	$aids = array_keys($activities);
+			
+	$prev_probe_responses = array();
+	$prev_activity_responses = array();
+	$prev_text_responses = array();
+	
+	if ($pids) {
+		$prev_probe_responses = $DB->get_records_select('notebook_probe_responses', "uid = $USER->id AND pid IN (" . implode(",",$pids) . ") ");
+	} 
+	
+	if ($aids) {
+		$prev_activity_responses = $DB->get_records_select('notebook_activity_responses', "uid = $USER->id AND aid IN (" . implode(",",$aids) . ") ");
+	} 
+		
+	$prev_text_responses = $DB->get_record_select('notebook_text_responses', "uid = $USER->id AND sid = $session->id");
+	
+	echo "<ol>";
+	
+	echo "<li> Ideas about the MATH CONTENT that I want to remember from this session:";  
+	
+	if ($prev_text_responses) echo "<p>$prev_text_responses->math</p>";    
+    echo '</li>';
+  
+  	echo "<li> Ideas that I want to apply in my work with my students:";  
+	if ($prev_text_responses) echo "<p>$prev_text_responses->students</p>";    
+    echo '</li>';
+    
+    echo "<li>Ideas for using the probes:";
+    
+    if ($prev_probe_responses) {
+    	echo "<table class='print'>";
+    	echo "<tr><th>Probe</th><th>Use</th><th>Plans</th></tr>";
+    	foreach ($prev_probe_responses as $response) {
+    		
+    		echo "<tr>";
+    		echo "<td class='name'>" . $probes[$response->pid]->name . "</td>";
+    		echo "<td class='use'>$response->useradio</td>";
+    		echo "<td class='plans'>$response->plans</td>";
+    		echo "</tr>";
+    	}
+    	echo "</table>";   	
+    }
+    echo "</li>";
+    
+    echo "<li>Ideas for using the activities:";
+    
+    if ($prev_activity_responses) {
+    	echo "<table class='print'>";
+    	echo "<tr><th>Activity</th><th>Use</th><th>Plans</th></tr>";
+    	foreach ($prev_activity_responses as $response) {
+    		echo "<tr>";
+    		echo "<td class='name'>" . $activities[$response->aid]->name . "</td>";
+    		echo "<td class='use'>$response->useradio</td>";
+    		echo "<td class='plans'>$response->plans</td>";
+    		echo "</tr>";
+    	}
+    	echo "</table>";   	
+    }
+    echo "</li>";
+  
+    echo "<li> Closing thoughts on this session:";  
+	if ($prev_text_responses) echo "<p>$prev_text_responses->thoughts</p>";    
+    echo '</li>';
+
+  	echo "</ol>";
+  	echo "</div>";
+  }
+  
+  echo "</div>";
+ 
+  echo "</div>";
+
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // File API                                                                   //
