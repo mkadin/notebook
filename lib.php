@@ -470,7 +470,7 @@ function notebook_print_user_entry($course, $user, $entry, $teachers, $grades) {
 		$notebook  = $DB->get_record('notebook', array('id' => $entry->notebook), '*', MUST_EXIST);
 		$sessions = $DB->get_records('notebook_sessions', array('nid' => $notebook->id));
 		if ($sessions) {
-			notebook_print($notebook, $sessions);
+			notebook_print($notebook, $sessions, $user);
 		}
         echo "</td></tr>";
     }
@@ -478,9 +478,9 @@ function notebook_print_user_entry($course, $user, $entry, $teachers, $grades) {
     
 }
 
-function notebook_print($notebook, $sessions)  {
+function notebook_print($notebook, $sessions,$user)  {
   
-  global $USER, $OUTPUT, $DB, $CFG;
+  global  $DB, $CFG;
   //require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
   //require_once(dirname(__FILE__).'/lib.php');
 
@@ -503,14 +503,14 @@ function notebook_print($notebook, $sessions)  {
 	$prev_text_responses = array();
 	
 	if ($pids) {
-		$prev_probe_responses = $DB->get_records_select('notebook_probe_responses', "uid = $USER->id AND pid IN (" . implode(",",$pids) . ") ");
+		$prev_probe_responses = $DB->get_records_select('notebook_probe_responses', "uid = $user->id AND pid IN (" . implode(",",$pids) . ") ");
 	} 
 	
 	if ($aids) {
-		$prev_activity_responses = $DB->get_records_select('notebook_activity_responses', "uid = $USER->id AND aid IN (" . implode(",",$aids) . ") ");
+		$prev_activity_responses = $DB->get_records_select('notebook_activity_responses', "uid = $user->id AND aid IN (" . implode(",",$aids) . ") ");
 	} 
 		
-	$prev_text_responses = $DB->get_record_select('notebook_text_responses', "uid = $USER->id AND sid = $session->id");
+	$prev_text_responses = $DB->get_record_select('notebook_text_responses', "uid = $user->id AND sid = $session->id");
 	
 	echo "<ol>";
 	

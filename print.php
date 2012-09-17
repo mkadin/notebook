@@ -82,7 +82,7 @@ $sessions = $DB->get_records('notebook_sessions', array('nid' => $nid));
 
 if ($sessions) {
   //echo $OUTPUT->heading($notebook->name);
-  notebook_print($notebook, $sessions);
+  notebook_print($notebook, $sessions, $USER);
 }
 else {
   echo $OUTPUT->heading('There are no sessions in this notebook.');
