@@ -82,6 +82,7 @@ else if ($results = $mform->get_data()) {
   $session->nid = $nid;
   $session->name = $results->session_name;
   $session->prompts = $results->session_prompts;
+  $session->directions = $results-directions;
    
   $DB->insert_record('notebook_sessions', $session);
   redirect("view.php?n={$notebook->id}");

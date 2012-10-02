@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/notebook/db" VERSION="20120807" COMMENT="XMLDB file for Moodle mod/notebook.  Create for DPD project"
+<XMLDB PATH="mod/notebook/db" VERSION="20120930" COMMENT="XMLDB file for Moodle mod/notebook.  Create for DPD project"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -30,7 +30,8 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" NEXT="nid"/>
         <FIELD NAME="nid" TYPE="int" LENGTH="11" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" COMMENT="Notebook id" PREVIOUS="id" NEXT="name"/>
         <FIELD NAME="name" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" COMMENT="Session name" PREVIOUS="nid" NEXT="prompts"/>
-        <FIELD NAME="prompts" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="Prompts for closing thoughts" PREVIOUS="name"/>
+        <FIELD NAME="prompts" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" COMMENT="Prompts for closing thoughts" PREVIOUS="name" NEXT="directions"/>
+        <FIELD NAME="directions" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" COMMENT="Directions for the session" PREVIOUS="prompts"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

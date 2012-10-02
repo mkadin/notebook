@@ -31,6 +31,10 @@ require_once(dirname(__FILE__) . '/notebook_edit_form.php');
 
 // Grab the sid from the url
 $id = optional_param('id', 0, PARAM_INT); // session ID
+$newSave = optional_param('newSave', 0, PARAM_INT);
+$ready = optional_param('ready', 0, PARAM_INT);
+$message = '';
+
 
 // Load the session from the url ID
 $session = $DB->get_record('notebook_sessions', array('id' => $id));
@@ -38,6 +42,14 @@ $session = $DB->get_record('notebook_sessions', array('id' => $id));
 // If the session is not found, throw an error
 if (!$session) {
   error('That session does not exist!');
+}
+
+if ($newSave) {
+	$message = '<h3>Your notebook session has been saved.</h3>';
+}
+
+if ($ready) {
+	$message .= '<h3>Your notebook session has been submitted to facilitators.</h3>';
 }
 
 // Load the notebook activity, course, and cm context from the problem, and up the chain.
@@ -99,11 +111,11 @@ add_to_log($course->id, 'notebook', 'view', "session.php?id={$cm->id}", $session
 		
 	$prev_text_responses = $DB->get_records_select('notebook_text_responses', "uid = $USER->id AND sid = $session->id");
 	
-	
  $mform = new notebook_edit_form("/mod/notebook/session.php?id={$session->id}", array('probes' => $probes, 'activities' => $activities, 'session' => $session));
  
  if ($responses = $mform->get_data()) {
  
+ 	notebook_debug($prev_text_responses);
  	$timenow = time();
     $newentry->modified = $timenow;
  
@@ -164,7 +176,6 @@ add_to_log($course->id, 'notebook', 'view', "session.php?id={$cm->id}", $session
 		      } else {
 		      	$new_response->aid = $item_id;
 		      }
-		      notebook_debug($fields);
 		      if (array_key_exists("useradio",$fields))  $new_response->useradio = $fields['useradio'];
 			  $new_response->plans = $fields['plans'];
       		  $new_response->uid = $USER->id;
@@ -181,12 +192,24 @@ add_to_log($course->id, 'notebook', 'view', "session.php?id={$cm->id}", $session
       $new_response->math = $form_text['math'];
       $new_response->students = $form_text['students'];
       $new_response->thoughts = $form_text['thoughts'];
-      if (array_key_exists("submit_session",$form_text)) $new_response->submit_session = $form_text['submit_session'];
+      
+      if (array_key_exists("submit_session",$form_text)) {
+      	$new_response->submit_session = $form_text['submit_session'];      	
 
+		// check if they had previously submitted the session to facilitors
+		$prev_text_responses_id = array_shift(array_keys($prev_text_responses));
+		$ready_response = $prev_text_responses[$prev_text_responses_id]->submit_session;
+
+      	if (!$ready_response) {
+      	  // send a message on reload
+      	  $ready = '&ready=1';
+      	}
+      }
+      
       $DB->insert_record('notebook_text_responses',$new_response);
   
   echo 'Got data';
-  redirect("session.php?id=$id&newSave=1");
+  redirect("session.php?id=$id&newSave=1$ready");
 }
 
 // set existing data.
@@ -223,10 +246,15 @@ $mform->set_data($form_data);
   // Output starts here
   
 echo $OUTPUT->header();
-echo $OUTPUT->heading('Ideas to Take Away Notebook');
-echo "<h3>$notebook->name</h3>";
+echo $OUTPUT->heading($notebook->name);
+echo "<div id='directions'><h4>$session->directions</h4></div>";
+
+if ($message) {
+	echo "<div class='message'>$message</div>";
+}
 
 $mform->display();
+
 
 echo "<div class='print-notebook'>";
 echo '<a id="print" href="' . $CFG->wwwroot . '/mod/notebook/print.php?n=' . $notebook->id . '&amp;sid=' . $session->id .'" onclick="display_confirm(\'' . $CFG->wwwroot . '/mod/notebook/print.php?n=' . $notebook->id . '&amp;sid=' . $session->id . '\',\'print\'); return false;">Print my notebook</a>';
@@ -236,7 +264,7 @@ $i = 0;
 $num_sessions = count($sessions);
 echo "<div class='notebook-session-list'>";
 echo "<p><strong>My notebook sessions:</strong></p>";
-echo "<ul>";
+echo "<ul id='session-links'>";
 foreach ($sessions as $session) {
 	$class = 'session';
 	if ($i == 0) {
@@ -245,7 +273,7 @@ foreach ($sessions as $session) {
         $class = 'last';
     }
     $i++;
-  echo '<li class="'.$class.'"><a href="' . $CFG->wwwroot . '/mod/notebook/session.php?id=' . $session->id . '">' . $session->name . '</a>';
+  echo '<li class="'.$class. '"><a href="#" onclick=display_confirm(\''. $CFG->wwwroot . '/mod/notebook/session.php?id=' . $session->id . '\');>' . $session->name . '</a>';
   echo '</li>';
 }
 echo "</ul>";

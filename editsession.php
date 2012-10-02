@@ -83,6 +83,7 @@ else {
   if ($results = $mform->get_data()) {
       $session->name = $results->name;
       $session->prompts = $results->prompts;
+      $session->directions = $results->directions;
       $updated_record = $DB->update_record('notebook_sessions', $session);
       
       redirect("view.php?n=$nid");
