@@ -22,15 +22,15 @@ class notebook_edit_form extends moodleform {
   		  $mform->addElement('textarea', "text-math", '', 'wrap="virtual" rows="3" cols="100"', array('class'=> 'plans'));
           $mform->addElement('html','</li>');
           
-          $mform->addElement('html',"<li class='ideas-students'><p>Ideas that I want to apply in my work with students</p>");
+          $mform->addElement('html',"<li class='ideas-students'><p>Ideas that I want to apply in my work with students.</p>");
   		  $mform->addElement('textarea', "text-students", '', 'wrap="virtual" rows="3" cols="100"', array('class'=> 'plans'));
           $mform->addElement('html','</li>');
 
-		  $mform->addElement('html', '<li><p>Check any <strong>formative assessment probes</strong> that you would like to try with students. Then write down ideas for how you will use them</p>');
+		  $mform->addElement('html', '<li><p>Check any <strong>formative assessment probes</strong> that you would like to try with students.</p>');
 		  $mform->addElement('html','<table class="probes">');
-  		  $mform->addElement('html',"<tr><th> Probes</th>");
+  		  $mform->addElement('html',"<tr><th>Probes</th>");
   		  $mform->addElement('html',"<th>Would you use this probe?</th>");
-  		  $mform->addElement('html',"<th>Plan</th>");
+  		  $mform->addElement('html',"<th>Optional: Write Plans for Using the Probe</th>");
   		  $mform->addElement('html','</tr>');
   		    
        
@@ -43,7 +43,7 @@ class notebook_edit_form extends moodleform {
           $mform->addElement('html','</table>');
           $mform->addElement('html', '</li>');
           
-          $mform->addElement('html', '<li><p>Check the <strong>activities/instructional practices</strong> that you would like to try with students. Then write down ideas for how you will use them</p>');
+          $mform->addElement('html', '<li><p>Check the <strong>activities/instructional practices</strong> that you would like to try with students.</p>');
           $mform->addElement('html','<table class="activities">');
   		  $mform->addElement('html',"<tr><th> Activities</th>");
   		  $mform->addElement('html',"<th>Would you use this activity?</th>");
