@@ -47,7 +47,7 @@ class notebook_edit_form extends moodleform {
           $mform->addElement('html','<table class="activities">');
   		  $mform->addElement('html',"<tr><th> Activities</th>");
   		  $mform->addElement('html',"<th>Would you use this activity?</th>");
-  		  $mform->addElement('html',"<th>Plan</th>");
+  		  $mform->addElement('html',"<th>Optional: Write Plans for Using the Activity</th>");
   		  $mform->addElement('html','</tr>');
           
            $index = 1;
